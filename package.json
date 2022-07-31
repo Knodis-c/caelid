@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "bash scripts/webpack_port.sh | xargs -I{} webpack-dev-server --port {} --mode development"
+    "dev": "bash scripts/webpack-dev.sh"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.18.9",
