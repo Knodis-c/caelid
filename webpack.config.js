@@ -1,5 +1,7 @@
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { resolve } = require("path");
 
 module.exports = (env, args) => {
@@ -10,14 +12,18 @@ module.exports = (env, args) => {
     entry: resolve(CWD, "assets/javascript/entry/application_v1.tsx"), 
 
     output: {
-        path: resolve(CWD, "public"),
-        filename: production ? "[name].[contenthash].js" : "[name].[hash].js",
+      path: resolve(CWD, "public"),
+      filename: production ? "[name].[contenthash].js" : "[name].[fullhash].js",
+      clean: true
     },
 
     devServer: {
       static: {
         directory: resolve(CWD, "public"),
         publicPath: "/static",
+      },
+      devMiddleware: {
+        writeToDisk: true
       },
       hot: true
     },
@@ -63,7 +69,13 @@ module.exports = (env, args) => {
     },
 
     plugins: [
+      new HtmlWebpackPlugin({
+        template: resolve(CWD, "assets/html/layouts/application_v1.html"),
+        filename: resolve(CWD, "assets/html/layouts/dist/application_v1.html"),
+        publicPath: "/static"
+      }),
       new ForkTsCheckerWebpackPlugin({ async: false }),
+      new CleanWebpackPlugin(),
     ],
   }
 }

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "webpack-dev-server --port 8080 --mode development"
+    "dev": "bash scripts/webpack_port.sh | xargs -I{} webpack-dev-server --port {} --mode development"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.18.9",
@@ -11,8 +11,10 @@
     "@typescript-eslint/parser": "^5.31.0",
     "autoprefixer": "^10.4.8",
     "babel-loader": "^8.2.5",
+    "clean-webpack-plugin": "^4.0.0",
     "eslint": "^8.20.0",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
+    "html-webpack-plugin": "^5.5.0",
     "postcss": "^8.4.14",
     "postcss-import": "^14.1.0",
     "postcss-nested": "^5.0.6",

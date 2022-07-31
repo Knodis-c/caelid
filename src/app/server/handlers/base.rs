@@ -8,7 +8,7 @@ use actix_web::{
 use crate::app::server::shared::template::{Context, Engine};
 
 pub async fn index(_req: HttpRequest, template_engine: web::Data<Engine>) -> Result<HttpResponse> {
-    let body = template_engine.render("index", &Context::new())?;
+    let body = template_engine.render("base/index", &Context::new())?;
 
     let res = HttpResponse::Ok()
         .content_type(ContentType::html())
