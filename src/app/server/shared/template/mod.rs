@@ -47,6 +47,10 @@ impl Engine {
         self.render(name, &ctx)
     }
 
+    pub fn react_component(&self) -> String {
+        "<div data-react-class='test-class' data-react-props='{\"a\":1,\"b\":2}'></div>".to_string()
+    }
+
     /// Base context.
     fn base_ctx_v1() -> tera::Context {
         let mut ctx = tera::Context::new();
