@@ -1,5 +1,4 @@
 use actix_web::{App, HttpServer};
-use dotenv;
 use std::net::{Ipv4Addr, SocketAddrV4};
 
 mod handlers;
@@ -12,8 +11,6 @@ pub const DEFAULT_PORT: &'static str = "3000";
 
 pub async fn init() -> std::io::Result<()> {
     use shared::template;
-
-    dotenv::dotenv().ok();
 
     let app_factory = || {
         let templating_engine = template::Engine::init().unwrap();

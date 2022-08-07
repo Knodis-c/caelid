@@ -2,10 +2,11 @@
 <html lang="en">
   <head>
     <title>{% block title %}{% endblock title %}</title>
+    <link rel="icon" href="data:;base64,iVBORwOKGO=" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-  </head>
-  <body>
+    <script defer src="{{ application_v1_js }}"></script>
+  <body class="bg-black">
     <main>
       {% block content %}{% endblock content %}
     </main>
