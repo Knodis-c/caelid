@@ -8,7 +8,7 @@ module.exports = (env, args) => {
   const production = (args.mode === "production");
 
   return {
-    entry: resolve(CWD, "assets/javascript/entry/application_v1.tsx"), 
+    entry: resolve(CWD, "assets/javascript/application_v1.tsx"), 
 
     output: {
       path: resolve(CWD, "public"),
@@ -35,9 +35,9 @@ module.exports = (env, args) => {
           test: /\.css$/,
           exclude: /node_modules/,
           use: [
-            { loader: 'style-loader', },
-            { loader: 'css-loader', options: { importLoaders: 1 } },
-            { loader: 'postcss-loader' }
+            { loader: "style-loader", },
+            { loader: "css-loader", options: { importLoaders: 1 } },
+            { loader: "postcss-loader" }
           ]
         },
         // TypeScript
@@ -65,7 +65,10 @@ module.exports = (env, args) => {
           configFile: resolve(CWD, "tsconfig.json"),
           extensions: [".js", ".jsx", ".json", ".ts", ".tsx"]
         })
-      ]
+      ],
+      fallback: {
+        path: require.resolve("path-browserify")
+      },
     },
 
     plugins: [

@@ -3,6 +3,7 @@ use actix_web::{
     http::StatusCode,
     web
 };
+use crate::lib::json::JSONStr;
 use std::fs;
 use std::net::{Ipv4Addr, SocketAddrV4};
 
@@ -47,8 +48,16 @@ impl Engine {
         self.render(name, &ctx)
     }
 
-    pub fn react_component(&self) -> String {
-        "<div data-react-class='test-class' data-react-props='{\"a\":1,\"b\":2}'></div>".to_string()
+    /// Generates an HTML string that is loaded into the template, which is to be the target
+    /// container for the React component. The `component_name` argument uses
+    /// `assets/javascript/components` as the root directory, so for the component,
+    /// `assets/javascript/components/some_component/index`, the `component_name` parameter should
+    /// be `some_component/index`.
+    pub fn react_component(&self, component_name: &str, props: Option<&JSONStr>) -> String {
+        match props {
+            Some(p) => format!("<div data-react-class='{component_name}' data-react-props='{p}'></div>"),
+            None => format!("<div data-react-class='{component_name}'></div>")
+        }
     }
 
     /// Base context.
