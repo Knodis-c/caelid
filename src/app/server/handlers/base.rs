@@ -25,7 +25,7 @@ pub async fn index(_req: HttpRequest, template_engine: web::Data<Engine>) -> Res
     let props = TestProps { a: 3, b: 4 };
     let props_json = props.to_json()?;
 
-    let react_component = template_engine.react_component("test/inde", Some(&props_json));
+    let react_component = template_engine.react_component("test/index", Some(&props_json));
 
     ctx.insert("component", &react_component);
     ctx.insert("msg", "Hello World");
