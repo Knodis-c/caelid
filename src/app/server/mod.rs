@@ -33,6 +33,8 @@ pub async fn init() -> std::io::Result<()> {
 
     let socketaddr = SocketAddrV4::new(host, port);
 
+    log::info!("Listening on {}", socketaddr.to_string());
+
     HttpServer::new(app_factory)
         .bind(socketaddr)?
         .run() 
