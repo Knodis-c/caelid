@@ -1,10 +1,12 @@
 use actix_web::{App, HttpServer};
+use middleware::request_info::RequestInfoFactory;
 use std::net::{Ipv4Addr, SocketAddrV4};
 
+mod assets;
 mod handlers;
+mod middleware;
 mod routes;
 mod shared;
-mod assets;
 
 pub const DEFAULT_HOST: &'static str = "127.0.0.1";
 pub const DEFAULT_PORT: &'static str = "3000";
@@ -17,6 +19,7 @@ pub async fn init() -> std::io::Result<()> {
 
         App::new()
             .app_data(templating_engine)
+            .wrap(RequestInfoFactory::new()) // This must be the innermost middleware i.e. it must go last.
             .configure(assets::static_assets)
             .configure(routes::routes)
     };
