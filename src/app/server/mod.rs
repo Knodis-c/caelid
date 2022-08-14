@@ -19,7 +19,7 @@ pub async fn init() -> std::io::Result<()> {
 
         App::new()
             .app_data(templating_engine)
-            .wrap(RequestInfoFactory::new())
+            .wrap(RequestInfoFactory::new()) // This must be the innermost middleware i.e. it must go last.
             .configure(assets::static_assets)
             .configure(routes::routes)
     };

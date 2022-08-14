@@ -4,8 +4,11 @@ use actix_web::{
 };
 use crate::lib::ansi::graphics;
 use futures_util::future::LocalBoxFuture;
-use std::future::{ready, Ready};
-use std::time::Instant;
+use std::{
+    future::{ready, Ready},
+    time::Instant
+};
+use uuid::Uuid;
 
 pub struct RequestInfoFactory;
 
@@ -33,23 +36,7 @@ where
 }
 
 pub struct RequestInfoMiddleware<S> {
-    service: S,
-}
-
-impl<S> RequestInfoMiddleware<S> {
-    pub fn log_request_info(&self, req: &ServiceRequest) {
-        let conn_info = req.connection_info();
-        let ip = conn_info.realip_remote_addr()
-            .and_then(|ip| Some(format!("{}={}", graphics::bold("ip"), ip)))
-            .or(Some("".to_owned()))
-            .unwrap();
-
-        let host = format!("{}={}", graphics::bold("host"), conn_info.host());
-        let method = format!("{}={}", graphics::bold("method"), req.method());
-        let path = format!("{}={}", graphics::bold("path"), req.path());
-
-        log::info!("{}", format!("{method} {path} {host} {ip}"));
-    }
+    service: S
 }
 
 impl<S, B> Service<ServiceRequest> for RequestInfoMiddleware<S>
@@ -65,16 +52,35 @@ where
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let duration = Instant::now();
+        let timestamp = Instant::now();
 
-        self.log_request_info(&req);
+        let output = {
+            let request_id = Uuid::new_v4();
+            let conn_info = req.connection_info();
+            let ip = conn_info.realip_remote_addr()
+                .and_then(|ip| Some(format!("{}={}", graphics::bold("ip"), ip)))
+                .or(Some("".to_owned()))
+                .unwrap(); // Will never panic.
+
+            let host = format!("{}={}", graphics::bold("host"), conn_info.host());
+            let method = format!("{}={}", graphics::bold("method"), req.method());
+            let path = format!("{}={}", graphics::bold("path"), req.path());
+            let req_id = format!("{}={}", graphics::bold("request_id"), request_id);
+
+            format!("{method} {path} {host} {req_id} {ip}")
+        };
 
         let fut = self.service.call(req);
 
         Box::pin(async move {
             let res = fut.await?;
 
-            log::info!("duration={}", duration.elapsed().as_millis());
+            log::info!(
+                "{output} {}={}ms",
+                graphics::bold("duration"),
+                timestamp.elapsed().as_millis()
+            );
+
             Ok(res)
         })
     }
