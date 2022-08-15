@@ -1,15 +1,17 @@
 #![allow(dead_code)]
 
 use diesel::{
+    Connection,
     PgConnection,
-    r2d2::{Builder, ConnectionManager, Pool}
+    r2d2::{Builder, ConnectionManager, PooledConnection, Pool}
 };
 use scheduled_thread_pool::ScheduledThreadPool;
 use std::{
     error::Error,
     fmt,
-    time::Duration,
-    sync::Arc
+    ops::Deref,
+    sync::Arc,
+    time::Duration
 };
 
 /// Number of connections per Actix worker.
@@ -24,6 +26,8 @@ const PG_URI: &'static str = "PG_TEST_URI";
 #[cfg(not(test))]
 const PG_URI: &'static str = "PG_URI";
 
+/// A facade over a connection pool object which is meant to be used on a per worker basis.
+/// One instance of `Pg` per worker essentially.
 pub struct Pg {
     uri: String,
     thread_pool_size: u8,
@@ -35,9 +39,14 @@ pub struct Pg {
     pool: Pool<Manager>
 }
 
+/// App's connection manager for Postgres-type connections.
 pub type Manager = ConnectionManager<PgConnection>;
 
+/// A connection from the pool.  
+pub type PgConn = PooledConnection<Manager>;
+
 impl Pg {
+    /// Initializes `Pg`. Meant to be used on a per worker basis.
     pub fn init() -> Result<Self, Box<dyn Error>> {
         let uri = dotenv::var(PG_URI)?;
 
@@ -71,6 +80,20 @@ impl Pg {
             pool,
             thread_pool_size: THREAD_POOL_SIZE
         })
+    }
+
+    fn execute(&self, sql: &str) -> Result<usize, String> {
+        let pooled_conn = match self.pool.get() {
+            Ok(conn) => conn,
+            Err(e) => return Err(e.to_string())
+        };
+
+        let pg_conn = &*pooled_conn;
+
+        match pg_conn.execute(sql) {
+            Ok(val) => Ok(val),
+            Err(e) => return Err(e.to_string())
+        }
     }
 }
 
