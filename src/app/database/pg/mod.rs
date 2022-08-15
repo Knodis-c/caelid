@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use diesel::{
     PgConnection,
     r2d2::{Builder, ConnectionManager, Pool}
@@ -10,11 +12,11 @@ use std::{
     sync::Arc
 };
 
-/// Number of connections per LOGICAL CPU core.
-const CONNS_PER_CORE: u8 = 5;
+/// Number of connections per Actix worker.
+pub const CONNS_PER_WORKER: u8 = 5;
 
 /// Number of threads for the connection manager to handle async operations.
-const THREAD_POOL_SIZE: u8 = 3;
+pub const THREAD_POOL_SIZE: u8 = 3;
 
 pub struct Pg {
     uri: String,
@@ -33,8 +35,7 @@ impl Pg {
     pub fn init() -> Result<Self, Box<dyn Error>> {
         let uri = dotenv::var("PG_URI")?;
 
-        let cores = Self::compute_pool_size();
-        let connection_pool_size = cores * CONNS_PER_CORE;
+        let connection_pool_size = CONNS_PER_WORKER;
         let thread_pool = ScheduledThreadPool::new(THREAD_POOL_SIZE.into());
 
         let idle_timeout = Duration::from_secs(10 * 60);
@@ -64,19 +65,6 @@ impl Pg {
             pool,
             thread_pool_size: THREAD_POOL_SIZE
         })
-    }
-
-    pub fn compute_pool_size() -> u8 {
-        let logical_cores = num_cpus::get();
-        let physical_cores = num_cpus::get_physical();
-
-        if logical_cores > physical_cores {
-            log::info!("Current system supports simultaneous multithreading.")
-        } else {
-            log::info!("Current system does not support simultaneous multithreading.")
-        }
-
-        logical_cores as u8
     }
 }
 

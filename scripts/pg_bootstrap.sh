@@ -9,7 +9,3 @@ psql -U $(whoami) -d template1 <<SQL
 CREATE USER caelid;
 CREATE DATABASE caelid_development WITH owner = 'caelid';
 SQL
-
-conn_uri="postgresql://caelid@localhost:5432/caelid_development"
-
-echo $conn_uri
