@@ -1,7 +1,6 @@
 use actix_web::{
     error::InternalError,
-    http::StatusCode,
-    web
+    http::StatusCode
 };
 use crate::lib::json::JSONStr;
 use std::fs;
@@ -20,9 +19,9 @@ type EngineResult<T> = actix_web::Result<T>;
 
 impl Engine {
     /// Initializes a shareable instance of `Engine` across all routes/handlers.
-    pub fn init() -> Result<web::Data<Self>, tera::Error> {
+    pub fn init() -> Result<Self, tera::Error> {
         let tera = tera::Tera::new(PATH_TO_HTML)?;
-        let engine = web::Data::new(Engine { engine: tera });
+        let engine = Engine { engine: tera };
         Ok(engine)
     }
 
@@ -71,7 +70,7 @@ impl Engine {
 
     #[cfg(any(debug_assertions, test))]
     fn application_v1_js() -> String {
-        use super::super::assets::{PUBLIC_PATH, STATIC_ASSETS_PATH};
+        use crate::app::server::assets::{PUBLIC_PATH, STATIC_ASSETS_PATH};
 
         let webpack_port = dotenv::var("WEBPACK_DEV_SERVER_PORT")
             .unwrap_or("8080".to_owned())
@@ -107,15 +106,5 @@ impl Engine {
     fn application_v1_js() -> String {
         todo!();
         "".to_string()
-    }
-}
-
-#[cfg(test)]
-mod test {
-    #[test]
-    fn application_v1_assertions() {
-        use super::Engine;
-
-        dbg!(Engine::application_v1_js());
     }
 }

@@ -1,25 +1,28 @@
 use actix_web::{App, HttpServer, web};
-use crate::app::database::pg::{CONNS_PER_WORKER, Pg};
+use crate::app::{
+    database::pg::{CONNS_PER_WORKER, Pg},
+    template_engine
+};
 use middleware::request_info::RequestInfoFactory;
-use shared::template;
 use std::net::{Ipv4Addr, SocketAddrV4};
 
-mod assets;
+pub mod assets;
 mod handlers;
 mod middleware;
 mod routes;
-mod shared;
 
 pub const DEFAULT_HOST: &'static str = "127.0.0.1";
 pub const DEFAULT_PORT: &'static str = "3000";
 
 pub async fn init() -> std::io::Result<()> {
     let app_factory = || {
-        let templating_engine = template::Engine::init().unwrap();
         let pg = Pg::init().map(|pool| web::Data::new(pool)).unwrap();
+        let template_engine = template_engine::Engine::init()
+            .map(|engine| web::Data::new(engine))
+            .unwrap();
 
         App::new()
-            .app_data(templating_engine)
+            .app_data(template_engine)
             .app_data(pg)
             .wrap(RequestInfoFactory::new()) // This must be the innermost middleware i.e. it must go last.
             .configure(assets::static_assets)
