@@ -18,7 +18,8 @@ pub type Context = tera::Context;
 type EngineResult<T> = actix_web::Result<T>;
 
 impl Engine {
-    /// Initializes a shareable instance of `Engine` across all routes/handlers.
+    /// Initializes a shareable instance of `Engine` meant to be shared on a per actix worker
+    /// basis.
     pub fn init() -> Result<Self, tera::Error> {
         let tera = tera::Tera::new(PATH_TO_HTML)?;
         let engine = Engine { engine: tera };
