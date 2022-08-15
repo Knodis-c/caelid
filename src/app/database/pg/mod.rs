@@ -18,6 +18,12 @@ pub const CONNS_PER_WORKER: u8 = 5;
 /// Number of threads for the connection manager to handle async operations.
 pub const THREAD_POOL_SIZE: u8 = 3;
 
+#[cfg(test)]
+const PG_URI: &'static str = "PG_TEST_URI";
+
+#[cfg(not(test))]
+const PG_URI: &'static str = "PG_URI";
+
 pub struct Pg {
     uri: String,
     thread_pool_size: u8,
@@ -33,7 +39,7 @@ pub type Manager = ConnectionManager<PgConnection>;
 
 impl Pg {
     pub fn init() -> Result<Self, Box<dyn Error>> {
-        let uri = dotenv::var("PG_URI")?;
+        let uri = dotenv::var(PG_URI)?;
 
         let connection_pool_size = CONNS_PER_WORKER;
         let thread_pool = ScheduledThreadPool::new(THREAD_POOL_SIZE.into());

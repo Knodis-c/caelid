@@ -13,3 +13,5 @@ SQL
 psql -U $(whoami) -d template1 <<SQL
 CREATE DATABASE caelid_test WITH owner = 'caelid';
 SQL
+
+exit 0
