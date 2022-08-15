@@ -1,0 +1,30 @@
+#!/bin/bash
+
+var=$(awk '/PG_URI/ { print $0; }' .env)
+uri=${var//PG_URI=/}
+
+case $1 in
+  "up") diesel migration run --database-url=$uri
+  ;;
+  "down") diesel migration revert --database-url=$uri
+  ;;
+  "redo") diesel migration redo --database-url=$uri
+  ;;
+  "list") diesel migration list --database-url=$uri
+  ;;
+  *) cat <<EOT
+USAGE:
+  pg_migrate [options] <argument>
+
+ARGUMENTS:
+  up      Run migration
+  down    Revert migration
+  list    List all migrations
+  redo    Undo last migration and re-run immediately
+
+OPTIONS:
+  -h      Display help text
+EOT
+  ;;
+esac
+

@@ -9,3 +9,7 @@ psql -U $(whoami) -d template1 <<SQL
 CREATE USER caelid;
 CREATE DATABASE caelid_development WITH owner = 'caelid';
 SQL
+
+psql -U $(whoami) -d template1 <<SQL
+CREATE DATABASE caelid_test WITH owner = 'caelid';
+SQL
