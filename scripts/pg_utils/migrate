@@ -1,0 +1,75 @@
+#!/bin/bash
+
+read -r -d "" help << EOT
+USAGE:
+  pg_migrate [options] <argument>
+
+ARGUMENTS:
+  up                  Run migration.
+  down                Revert migration.
+  list                List all migrations.
+  redo                Undo last migration and re-run immediately.
+
+OPTIONS:
+  -h, --help          Display help text.
+  -e [test|not_test]  Determines which database to run migrations for.
+EOT
+
+migrate() {
+  var=$(awk '/PG_URI/ { print $0; }' .env)
+  uri=${var//PG_URI=/}
+
+  env="not_test"
+
+  while (( "$#" )); do
+    case $1 in
+      "up")
+        cmd="run"
+      ;;
+
+      "down")
+        cmd="revert"
+      ;;
+
+      "redo")
+        cmd="redo"
+      ;;
+
+      "list")
+        cmd="list"
+      ;;
+
+      "-e")
+        shift
+
+        if [[ $1 == "test" || $1 == "not_test" ]]; then
+          env=$1
+        else
+          echo "Invalid input for option '-e'."
+          exit 1
+        fi
+
+        if [[ "$env" == "test" ]]; then
+          var=$(awk '/PG_TEST_URI/ { print $0; }' .env)
+          uri=${var//PG_TEST_URI=/}
+        fi
+      ;;
+
+      "-h"|"--help"|*)
+        echo "$help"
+        exit 0
+      ;;
+    esac
+
+    shift
+  done
+
+  if [[ -z $cmd ]]; then
+    echo "Invalid argument provided."
+    exit 1
+  fi
+
+  printf "Executing command: \e[36mdiesel migration $cmd --database-url=$uri\e[0m\n"
+
+  diesel migration $cmd --database-url=$uri
+}
