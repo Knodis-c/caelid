@@ -1,0 +1,34 @@
+#!/bin/bash
+
+read -r -d '' usage << EOT
+USAGE
+  bootstrap
+
+DESCRIPTION
+  Initializes development and test databases with owner.
+EOT
+
+bootstrap() {
+  if [[ $1 == "-h" || $1 == "--help" ]]; then
+    echo "$usage"
+    exit 0
+  fi
+
+  if [[ ! -f $(which psql) ]]; then
+    echo "Unable to locate psql. Please ensure you have postgres installed."
+    exit 0
+  fi
+
+  read -r -d "" development_db << SQL
+CREATE USER caelid;
+CREATE DATABASE caelid_development WITH owner = 'caelid';
+SQL
+
+  read -r -d "" test_db << SQL
+CREATE DATABASE caelid_test WITH owner = 'caelid'; 
+SQL
+
+  psql -U $(whoami) -d template1 -c $development_db
+
+  psql -U $(whoami) -d template1 -c $test_db
+}

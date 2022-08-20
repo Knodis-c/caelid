@@ -1,0 +1,36 @@
+#!/bin/bash
+
+read -r -d '' usage << EOT
+USAGE:
+  pg [options] <subcommands>
+
+SUBCOMMANDS:
+  migrate         Migration utilities.
+  bootstrap       Initializes development and test databases with user.
+
+OPTIONS:
+  -h              Display usage text.
+EOT
+
+source_dir=${BASH_SOURCE//pg/}
+
+case "$1" in
+  migrate)
+    source $source_dir/pg_utils/migrate --source-only
+    shift
+    migrate "$@"
+  ;;
+
+  bootstrap)
+    source $source_dir/pg_utils/bootstrap --source-only
+    shift
+    bootstrap "$@"
+  ;;
+
+  "-h"|*)
+    echo "$usage"
+    exit 0
+  ;;
+esac
+
+exit 0
