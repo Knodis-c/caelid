@@ -1,3 +1,35 @@
 #!/bin/bash
 
-watchexec -r -e rs,html -- cargo run
+read -r -d '' usage << "EOT"
+USAGE:
+  dev <argument>
+
+ARGUMENTS:
+  server, s        Runs application server.
+  webpack, w       Runs webpack development server. Meant to be used via npm.
+EOT
+
+run_server() {
+  watchexec -r -e rs,html -- cargo run
+}
+
+run_webpack() {
+  webpack_port=$(awk '/WEBPACK_DEV_SERVER_PORT/ { print $0; }' .env)
+  webpack_port_num=${webpack_port//[A-Z_=]/} 
+
+  webpack-dev-server --port $webpack_port_num --mode development
+}
+
+case "$1" in
+  server|s)
+    run_server
+  ;;
+  webpack|w)
+    run_webpack
+  ;;
+  "-h"|"--help"|*)
+    echo "$usage"
+  ;;
+esac
+
+exit 0
