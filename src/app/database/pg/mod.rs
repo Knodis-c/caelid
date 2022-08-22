@@ -100,7 +100,7 @@ impl Pg {
     /// ```rust
     /// let pg = Pg::init().unwrap();
     ///
-    /// let some_data = pg.with_conn::<_, SomeType>(|pg_conn: &PgConnection| {
+    /// let some_data = pg.with_conn::<_, SomeType>(|pg_conn| {
     ///     // Do something with the connection here that returns that ultimately
     ///     // returns `Result<SomeType, <Box dyn Error>>.
     /// });

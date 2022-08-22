@@ -1,4 +1,3 @@
-use diesel::PgConnection;
 use super::util_types::PgCurrentUser;
 
 use super::{
@@ -8,29 +7,18 @@ use super::{
 
 #[test]
 fn funcs() {
-    let maybe_pg = Pg::init();
-
-    let pg = match maybe_pg {
-        Ok(p) => p,
-        Err(e) => {
-            eprintln!("{}", e);
-            assert!(false);
-            return;
-        }
-    };
-
+    let pg = Pg::init().expect("Test failed with error:");
     current_user(&pg);
 }
 
 fn current_user(pg: &Pg) {
-    let current_user = pg.with_conn::<_, PgCurrentUser>(|pg_conn: &PgConnection| {
+    let pg_user = pg.with_conn::<_, PgCurrentUser>(|pg_conn| {
         let pg_current_user = Adapter::new(pg_conn).current_user()?;
         Ok(pg_current_user)
-    });
+    }).expect("Test failed with error:");
 
-    assert!(current_user.is_ok());
     assert_eq!(
-        current_user.unwrap().current_user,
+        pg_user.current_user,
         "caelid"
     );
 }
