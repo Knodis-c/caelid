@@ -19,16 +19,19 @@ bootstrap() {
     exit 0
   fi
 
-  read -r -d "" development_db << SQL
-CREATE USER caelid;
+  if [[ -z "$PG_HOST" ]]; then
+    PG_HOST="localhost"
+  fi
+
+  if [[ -z "$PG_USER" ]]; then
+    PG_USER=$(whoami)
+  fi
+
+  echo "PG_HOST: $PG_HOST    PG_USER: $PG_USER"
+
+  psql -h "$PG_HOST" -U "$PG_USER" -d template1 << SQL
+CREATE USER caelid WITH PASSWORD 'radahn';
 CREATE DATABASE caelid_development WITH owner = 'caelid';
+CREATE DATABASE caelid_test WITH owner = 'caelid';
 SQL
-
-  read -r -d "" test_db << SQL
-CREATE DATABASE caelid_test WITH owner = 'caelid'; 
-SQL
-
-  psql -U $(whoami) -d template1 -c $development_db
-
-  psql -U $(whoami) -d template1 -c $test_db
 }

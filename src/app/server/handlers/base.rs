@@ -7,7 +7,7 @@ use actix_web::{
 };
 use crate::{
     app::template_engine::{Context, Engine},
-    lib::json::JSON
+    internal::json::JSON
 };
 use serde::{Deserialize, Serialize};
 

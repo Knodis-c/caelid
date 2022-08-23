@@ -3,16 +3,18 @@
 use diesel::{
     Connection,
     PgConnection,
-    r2d2::{Builder, ConnectionManager, PooledConnection, Pool}
+    r2d2::{Builder, ConnectionManager, Pool}
 };
 use scheduled_thread_pool::ScheduledThreadPool;
 use std::{
     error::Error,
     fmt,
-    ops::Deref,
     sync::Arc,
     time::Duration
 };
+
+/// Exposes an adapter that interfaces with utilities that exist postgres-side.
+pub mod funcs;
 
 /// Number of connections per Actix worker.
 pub const CONNS_PER_WORKER: u8 = 5;
@@ -41,9 +43,6 @@ pub struct Pg {
 
 /// App's connection manager for Postgres-type connections.
 pub type Manager = ConnectionManager<PgConnection>;
-
-/// A connection from the pool.  
-pub type PgConn = PooledConnection<Manager>;
 
 impl Pg {
     /// Initializes `Pg`. Meant to be used on a per worker basis.
@@ -82,18 +81,33 @@ impl Pg {
         })
     }
 
-    fn execute(&self, sql: &str) -> Result<usize, String> {
-        let pooled_conn = match self.pool.get() {
-            Ok(conn) => conn,
-            Err(e) => return Err(e.to_string())
-        };
+    /// Executes a generic SQL statement, returning the number of rows affected if ok.
+    pub fn execute(&self, sql: &str) -> Result<usize, Box<dyn Error>> {
+        self.with_conn::<_, usize>(|pg_conn: &PgConnection| {
+            match pg_conn.execute(sql) {
+                Ok(val) => Ok(val),
+                Err(e) => return Err(Box::new(e))
+            }
+        })
+    }
 
+    /// Takes in a closure that receives a borrowed connection to postgres, allowing database
+    /// operations to occur within the scope of said closure. Example:
+    ///
+    /// ```rust
+    /// let pg = Pg::init().unwrap();
+    ///
+    /// let some_data = pg.with_conn::<_, SomeType>(|pg_conn| {
+    ///     // Do something with the connection here that returns that ultimately
+    ///     // returns `Result<SomeType, <Box dyn Error>>.
+    /// });
+    /// ```
+    pub fn with_conn<F, T>(&self, op: F) -> Result<T, Box<dyn Error>>
+        where F: FnOnce(&PgConnection) -> Result<T, Box<dyn Error>>,
+    {
+        let pooled_conn = self.pool.get()?;
         let pg_conn = &*pooled_conn;
-
-        match pg_conn.execute(sql) {
-            Ok(val) => Ok(val),
-            Err(e) => return Err(e.to_string())
-        }
+        op(pg_conn)
     }
 }
 

@@ -11,10 +11,40 @@ env:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v3
+      - uses: actions-rs/cargo@v1
+
+      - name: "App env vars"
+        run: cp .env-example .env
+
+      - name: "Diesel install"
+        run: cargo install diesel_cli 
+
+      - name: Test database initialization
+        env:
+          PG_HOST: localhost
+          PG_USER: postgres
+          PGPASSWORD: postgres
+        run: |
+          bash scripts/pg bootstrap
+          bash scripts/pg migrate up -e test
+
+      - name: Run tests
+        run: cargo test -- --nocapture
