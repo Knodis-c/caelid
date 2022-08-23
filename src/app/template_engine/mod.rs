@@ -2,7 +2,7 @@ use actix_web::{
     error::InternalError,
     http::StatusCode
 };
-use crate::lib::json::JSONStr;
+use crate::internal::json::JSONStr;
 use std::fs;
 use std::net::{Ipv4Addr, SocketAddrV4};
 

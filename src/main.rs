@@ -2,12 +2,12 @@
 use dotenv;
 
 mod app;
-mod lib;
+mod internal;
 mod schema;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    lib::log::init_logger();
+    internal::log::init_logger();
     app::server::init().await
 }
