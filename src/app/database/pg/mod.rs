@@ -3,7 +3,7 @@
 use diesel::{
     Connection,
     PgConnection,
-    r2d2::{Builder, ConnectionManager, PooledConnection, Pool}
+    r2d2::{Builder, ConnectionManager, Pool}
 };
 use scheduled_thread_pool::ScheduledThreadPool;
 use std::{
@@ -43,9 +43,6 @@ pub struct Pg {
 
 /// App's connection manager for Postgres-type connections.
 pub type Manager = ConnectionManager<PgConnection>;
-
-/// A connection from the pool.  
-pub type PgConn = PooledConnection<Manager>;
 
 impl Pg {
     /// Initializes `Pg`. Meant to be used on a per worker basis.
