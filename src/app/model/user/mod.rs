@@ -15,8 +15,8 @@ pub struct User {
     pub email: String,
     pub username: String,
 
-    #[serde(with = "ts_seconds_option")]
-    pub created_at: Option<NaiveDateTime>,
+    #[serde(with = "ts_seconds")]
+    pub created_at: NaiveDateTime,
 
     #[serde(with = "ts_seconds_option")]
     pub updated_at: Option<NaiveDateTime>,

@@ -3,7 +3,7 @@ CREATE TABLE users (
   password VARCHAR(80),
   email VARCHAR(255) UNIQUE NOT NULL,
   username VARCHAR(255) UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT current_timestamp,
+  created_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
   updated_at TIMESTAMP,
   deleted_at TIMESTAMP
 );

@@ -1,5 +1,5 @@
 mod prelude {
-    pub use chrono::naive::serde::ts_seconds_option;
+    pub use chrono::naive::serde::{ts_seconds, ts_seconds_option};
     pub use diesel::{
         expression_methods::ExpressionMethods,
         PgConnection,
