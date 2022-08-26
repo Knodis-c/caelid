@@ -11,7 +11,7 @@ mod prelude {
     pub use super::super::prelude::*;
 }
 
-#[persistent_entity]
+#[model]
 pub struct User {
     pub id: i32,
 
