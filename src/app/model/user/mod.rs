@@ -11,9 +11,7 @@ mod prelude {
     pub use super::super::prelude::*;
 }
 
-#[skip_serializing_none]
-#[derive(Identifiable, Insertable, Queryable, Serialize, Deserialize, PartialEq, Debug)]
-#[serde(rename_all = "camelCase")]
+#[persistent_entity]
 pub struct User {
     pub id: i32,
 
