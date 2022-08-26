@@ -14,7 +14,6 @@ mod prelude {
 #[skip_serializing_none]
 #[derive(Identifiable, Insertable, Queryable, Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
-#[table_name = "users"]
 pub struct User {
     pub id: i32,
 
