@@ -24,21 +24,3 @@ pub struct User {
     #[serde(with = "ts_seconds_option")]
     pub deleted_at: Option<NaiveDateTime>,
 }
-
-impl User {
-    pub fn insert(conn: &PgConnection, username: &str, email: &str, password: Option<&str>) -> Result<User, DieselError> {
-        let values = (
-            users::columns::username.eq(username),
-            users::columns::email.eq(email),
-            users::columns::password.eq(password)
-        );
-
-        diesel::insert_into(Self::table())
-            .values(&values)
-            .get_result(conn)
-    }
-
-    fn table() -> users::table {
-        users::table
-    }
-}
