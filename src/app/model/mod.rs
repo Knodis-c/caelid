@@ -1,5 +1,5 @@
-/// Prelude to import in every new model. Comes with all of the traits and types
-/// all model's in this application are expected to have.
+/// Prelude to import in every new model. Comes with all of the traits, types,
+/// and functions all models in this application are expected to have.
 mod prelude {
     pub use chrono::naive::{
         NaiveDateTime,
@@ -8,11 +8,12 @@ mod prelude {
     pub use crate::app::database::pg;
     pub use diesel::{
         associations::HasTable,
-        dsl::{select, sql},
+        dsl::*,
         expression_methods::{ExpressionMethods, PgExpressionMethods},
         pg::Pg,
         PgConnection,
         prelude::Insertable,
+        query_builder::IntoUpdateTarget,
         QueryDsl,
         Queryable,
         result::Error as DieselError,
