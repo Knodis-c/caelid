@@ -1,6 +1,15 @@
-use chrono::naive::NaiveDateTime;
 use crate::schema::users;
 use super::prelude::*;
+
+mod authentication;
+pub mod result;
+
+mod prelude {
+    pub use crate::schema::users;
+    pub use super::User;
+    pub use super::result::*; 
+    pub use super::super::prelude::*;
+}
 
 #[skip_serializing_none]
 #[derive(Identifiable, Insertable, Queryable, Serialize, Deserialize, PartialEq, Debug)]
@@ -24,3 +33,4 @@ pub struct User {
     #[serde(with = "ts_seconds_option")]
     pub deleted_at: Option<NaiveDateTime>,
 }
+
