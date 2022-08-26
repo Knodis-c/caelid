@@ -35,7 +35,7 @@ WHEN (OLD.password IS DISTINCT FROM NEW.password)
 EXECUTE FUNCTION bf_encrypt_password()
 ;
 
-CREATE OR REPLACE FUNCTION authenticate_user_via_password(uname VARCHAR(255), raw_password VARCHAR(72))
+CREATE OR REPLACE FUNCTION authenticate_user_via_uname_pw(uname VARCHAR(255), raw_password VARCHAR(72))
 RETURNS BOOLEAN AS $$
 DECLARE
 	encrypted_password VARCHAR(255);
