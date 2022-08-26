@@ -1,5 +1,7 @@
 #[macro_use] extern crate diesel;
+#[macro_use] extern crate proc_macros;
 use dotenv;
+
 
 mod app;
 mod internal;
