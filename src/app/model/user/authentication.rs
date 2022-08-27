@@ -3,7 +3,7 @@ use super::prelude::*;
 
 impl User {
     /// Returns `User` if provided `uname` and `pw` are valid.
-    pub fn authenticate_via_uname_pw(conn: &PgConnection, uname: &str, pw: &str) -> UserResult<Self> {
+    pub fn authenticate_via_uname_pw(conn: &mut PgConnection, uname: &str, pw: &str) -> UserResult<Self> {
         use pg::funcs;
 
         let result = users::table.filter(funcs::authenticate_user_via_uname_pw(uname, pw))

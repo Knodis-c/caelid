@@ -1,7 +1,11 @@
 #![allow(dead_code)]
 
 use diesel::{
-    Connection,
+    connection::SimpleConnection,
+
+    // Will implement when adding transaction functionality.
+    //Connection,
+
     PgConnection,
     r2d2::{Builder, ConnectionManager, Pool}
 };
@@ -9,6 +13,7 @@ use scheduled_thread_pool::ScheduledThreadPool;
 use std::{
     error::Error,
     fmt,
+    ops::DerefMut,
     sync::Arc,
     time::Duration
 };
@@ -81,11 +86,11 @@ impl Pg {
         })
     }
 
-    /// Executes a generic SQL statement, returning the number of rows affected if ok.
-    pub fn execute(&self, sql: &str) -> Result<usize, Box<dyn Error>> {
-        self.with_conn::<_, usize>(|pg_conn: &PgConnection| {
-            match pg_conn.execute(sql) {
-                Ok(val) => Ok(val),
+    /// Executes a generic SQL statement.
+    pub fn execute(&self, sql: &str) -> Result<(), Box<dyn Error>> {
+        self.with_conn::<_, ()>(|pg_conn| {
+            match pg_conn.batch_execute(sql) {
+                Ok(_) => Ok(()),
                 Err(e) => return Err(Box::new(e))
             }
         })
@@ -103,10 +108,10 @@ impl Pg {
     /// });
     /// ```
     pub fn with_conn<F, T>(&self, op: F) -> Result<T, Box<dyn Error>>
-        where F: FnOnce(&PgConnection) -> Result<T, Box<dyn Error>>,
+        where F: FnOnce(&mut PgConnection) -> Result<T, Box<dyn Error>>,
     {
-        let pooled_conn = self.pool.get()?;
-        let pg_conn = &*pooled_conn;
+        let mut pooled_conn = self.pool.get()?;
+        let pg_conn = pooled_conn.deref_mut();
         op(pg_conn)
     }
 }
