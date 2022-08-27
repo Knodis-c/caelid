@@ -22,7 +22,7 @@ use std::{
 pub mod funcs;
 
 /// Number of connections per Actix worker.
-pub const CONNS_PER_WORKER: u8 = 5;
+pub const CONNS_PER_WORKER: u8 = 10;
 
 /// Number of threads for the connection manager to handle async operations.
 pub const THREAD_POOL_SIZE: u8 = 3;
