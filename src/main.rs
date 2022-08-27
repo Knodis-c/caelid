@@ -15,5 +15,5 @@ mod schema;
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     internal::log::init_logger();
-    app::server::init().await
+    app::server::run().await
 }

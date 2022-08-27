@@ -367,6 +367,7 @@ dependencies = [
  "env_logger",
  "futures-util",
  "log",
+ "num_cpus",
  "proc-macros",
  "scheduled-thread-pool",
  "serde",
