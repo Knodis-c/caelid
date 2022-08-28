@@ -1,4 +1,9 @@
+use actix_web::rt::{self, signal};
 #[macro_use] extern crate diesel;
+use nix::{
+    unistd::Pid,
+    sys::signal::{kill, Signal}
+};
 #[macro_use] extern crate proc_macros;
 use dotenv;
 
@@ -25,7 +30,16 @@ fn cleanup() -> Result<(), std::io::Error> {
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     internal::log::init_logger();
-    let _pid = internal::pid::create()?;
+
+    let pid = internal::pid::create()? as i32;
+
+    // Handle SIGINT as a SIGTERM.
+    rt::spawn(async move {
+        signal::ctrl_c().await.unwrap();
+        kill(Pid::from_raw(pid), Signal::SIGTERM).unwrap();
+    });
+
     app::server::run().await?;
+
     cleanup()
 }
