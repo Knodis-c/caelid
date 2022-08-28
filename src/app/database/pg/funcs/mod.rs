@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use diesel::sql_types::{Bool, Varchar};
 
 sql_function! {

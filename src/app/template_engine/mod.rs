@@ -71,7 +71,7 @@ impl Engine {
 
     #[cfg(any(debug_assertions, test))]
     fn application_v1_js() -> String {
-        use crate::app::server::assets::{PUBLIC_PATH, STATIC_ASSETS_PATH};
+        use super::server::{PUBLIC_PATH, STATIC_ASSETS_PATH};
 
         let webpack_port = dotenv::var("WEBPACK_DEV_SERVER_PORT")
             .unwrap_or("8080".to_owned())
