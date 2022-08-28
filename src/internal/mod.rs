@@ -6,3 +6,6 @@ pub mod json;
 
 /// All things related to logging.
 pub mod log;
+
+/// Utility for pid files.
+pub mod pid;
