@@ -370,7 +370,6 @@ dependencies = [
  "nix",
  "num_cpus",
  "proc-macros",
- "r2d2",
  "scheduled-thread-pool",
  "serde",
  "serde_json",
