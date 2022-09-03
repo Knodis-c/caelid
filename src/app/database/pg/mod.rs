@@ -34,8 +34,8 @@ const PG_URI: &'static str = "PG_TEST_URI";
 const PG_URI: &'static str = "PG_URI";
 
 /// A facade over a connection pool object which is meant to be used on a per worker basis.
-/// One instance of `Pg` per worker essentially.
-pub struct Pg {
+/// One instance of `PgConnPool` per worker essentially.
+pub struct PgConnPool {
     uri: String,
     thread_pool_size: u8,
     min_idle: u32,
@@ -49,8 +49,8 @@ pub struct Pg {
 /// App's connection manager for Postgres-type connections.
 pub type Manager = ConnectionManager<PgConnection>;
 
-impl Pg {
-    /// Initializes `Pg`. Meant to be used on a per worker basis.
+impl PgConnPool {
+    /// Initializes `PgConnPool`. Meant to be used on a per worker basis.
     pub fn init() -> Result<Self, Box<dyn Error>> {
         let uri = dotenv::var(PG_URI)?;
 
@@ -100,7 +100,7 @@ impl Pg {
     /// operations to occur within the scope of said closure. Example:
     ///
     /// ```rust
-    /// let pg = Pg::init().unwrap();
+    /// let pg = PgConnPool::init().unwrap();
     ///
     /// let some_data = pg.with_conn::<_, SomeType>(|pg_conn| {
     ///     // Do something with the connection here that returns that ultimately
@@ -116,7 +116,7 @@ impl Pg {
     }
 }
 
-impl fmt::Display for Pg {
+impl fmt::Display for PgConnPool {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,

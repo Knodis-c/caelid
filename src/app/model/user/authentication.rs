@@ -30,7 +30,7 @@ mod test {
     fn authenticate_via_uname_pw() {
         use super::super::prelude::*;
 
-        let pg = pg::Pg::init().expect("Test failed with error");
+        let pg = pg::PgConnPool::init().expect("Test failed with error");
 
         let email = "cthulhu@ryleh.com";
         let uname = "cthulhu";

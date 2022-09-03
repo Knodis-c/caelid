@@ -9,7 +9,7 @@ use actix_web::{
     web
 };
 use crate::app::{
-    database::pg::{CONNS_PER_WORKER, Pg},
+    database::pg::{CONNS_PER_WORKER, PgConnPool},
     template_engine
 };
 use middleware::request_info::RequestInfoFactory;
@@ -38,7 +38,7 @@ fn app_factory() -> App<impl ServiceFactory<
     InitError = ()
 >>
 {
-    let pg = Pg::init().map(|pool| web::Data::new(pool)).unwrap();
+    let pg = PgConnPool::init().map(|pool| web::Data::new(pool)).unwrap();
 
     let template_engine = template_engine::Engine::init()
         .map(|engine| web::Data::new(engine))
