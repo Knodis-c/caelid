@@ -1,11 +1,7 @@
 #![allow(dead_code)]
 
+use actix_web::web;
 use diesel::{
-    connection::SimpleConnection,
-
-    // Will implement when adding transaction functionality.
-    //Connection,
-
     PgConnection,
     r2d2::{Builder, ConnectionManager, Pool}
 };
@@ -86,18 +82,8 @@ impl PgConnPool {
         })
     }
 
-    /// Executes a generic SQL statement.
-    pub fn execute(&self, sql: &str) -> Result<(), Box<dyn Error>> {
-        self.with_conn::<_, ()>(|pg_conn| {
-            match pg_conn.batch_execute(sql) {
-                Ok(_) => Ok(()),
-                Err(e) => return Err(Box::new(e))
-            }
-        })
-    }
-
-    /// Takes in a closure that receives a borrowed connection to postgres, allowing database
-    /// operations to occur within the scope of said closure. Example:
+    /// Takes in a closure that receives a borrowed pooled connection to postgres, allowing database
+    /// operations to occur asynchronously within the scope of said closure. Example:
     ///
     /// ```rust
     /// let pg = PgConnPool::init().unwrap();
@@ -105,14 +91,25 @@ impl PgConnPool {
     /// let some_data = pg.with_conn::<_, SomeType>(|pg_conn| {
     ///     // Do something with the connection here that returns that ultimately
     ///     // returns `Result<SomeType, <Box dyn Error>>.
-    /// });
+    /// }).await?;
     /// ```
-    pub fn with_conn<F, T>(&self, op: F) -> Result<T, Box<dyn Error>>
-        where F: FnOnce(&mut PgConnection) -> Result<T, Box<dyn Error>>,
+    ///
+    /// Diesel operations on blocking by nature, so fetching a pooled connection and `op` are sent
+    /// to a pooled blocking thread where blocking is acceptable.
+    pub async fn with_conn<F, U>(&self, op: F) -> Result<U, Box<dyn Error + Send + Sync>>
+    where
+        F: FnOnce(&mut PgConnection) -> Result<U, Box<dyn Error + Send + Sync>> + Send + 'static,
+        U: Send + 'static
     {
-        let mut pooled_conn = self.pool.get()?;
-        let pg_conn = pooled_conn.deref_mut();
-        op(pg_conn)
+        let cloned_pool = self.pool.clone();
+
+        web::block(move || -> Result<U, Box<dyn Error + Send + Sync>> {
+            let mut pooled_conn = cloned_pool.get()?;
+            
+            let raw_conn = pooled_conn.deref_mut();
+
+            Ok(op(raw_conn)?)
+        }).await?
     }
 }
 
