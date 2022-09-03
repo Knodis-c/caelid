@@ -26,17 +26,17 @@ impl User {
 
 #[cfg(test)]
 mod test {
-    #[test]
-    fn authenticate_via_uname_pw() {
+    #[actix_web::test]
+    async fn authenticate_via_uname_pw() {
         use super::super::prelude::*;
 
         let pg = pg::PgConnPool::init().expect("Test failed with error");
 
-        let email = "cthulhu@ryleh.com";
-        let uname = "cthulhu";
-        let pw = "randolphcarter!";
-
         let authenticated_user = pg.with_conn::<_, User>(|conn| {
+            let email = "cthulhu@ryleh.com";
+            let uname = "cthulhu";
+            let pw = "randolphcarter!";
+
             let values = (
                 users::email.eq(email),
                 users::username.eq(uname),
@@ -50,7 +50,7 @@ mod test {
             let auth_user = User::authenticate_via_uname_pw(conn, uname, pw)?;
 
             Ok(auth_user)
-        });
+        }).await;
 
         assert!(authenticated_user.is_ok());
     }
