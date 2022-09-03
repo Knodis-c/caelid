@@ -89,8 +89,7 @@ impl PgConnPool {
     /// let pg = PgConnPool::init().unwrap();
     ///
     /// let some_data = pg.with_conn::<_, SomeType>(|pg_conn| {
-    ///     // Do something with the connection here that returns that ultimately
-    ///     // returns `Result<SomeType, <Box dyn Error>>.
+    ///     // Do something with the connection here.
     /// }).await?;
     /// ```
     ///
