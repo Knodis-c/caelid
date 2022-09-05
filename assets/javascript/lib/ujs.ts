@@ -1,6 +1,7 @@
 /* Inspired by the https://github.com/reactjs/react-rails#ujs approach. */
 
-import { createRoot } from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
 import ApplicationError from "lib/application_error";
 
 /**
@@ -8,8 +9,8 @@ import ApplicationError from "lib/application_error";
  */
 export const COMPONENTS_CACHE: Record<string, any> = {};
 
-const CONTAINER_NAME_ATTR = "data-react-class";
-const CONTAINER_PROP_ATTR = "data-react-props";
+export const CONTAINER_NAME_ATTR = "data-react-class";
+export const CONTAINER_PROP_ATTR = "data-react-props";
 
 /**
  * Custom webpack context that imports every (.tsx|.ts|.jsx|.js) file from ../components
@@ -23,6 +24,8 @@ export function importComponents() {
 
 /**
  * Queries for all target containers and mounts their respective React components.
+ * React components that utilize WASM modules are asynchronously mounted since WASM modules
+ * must be asynchronously built.
  */
 export function mountComponents() {
   const targets = document.querySelectorAll(`[${CONTAINER_NAME_ATTR}]`);
@@ -36,13 +39,23 @@ export function mountComponents() {
     }
 
     const rawProps = target.getAttribute(CONTAINER_PROP_ATTR);
-    const container = createRoot(target);
+    const container = ReactDOM.createRoot(target);
 
     if (rawProps) {
       const props = JSON.parse(rawProps);
-      container.render(component.default(props));
+
+      if (typeof component === "object" && typeof component.then === "function")
+        // @ts-ignore
+        component.then(c => container.render(React.createElement(c.default, props)));
+      else
+        container.render(React.createElement(component.default, props));
+
     } else {
-      container.render(component.default());
+      if (typeof component === "object" && typeof component.then === "function")
+        // @ts-ignore
+        component.then(c => container.render(React.createElement(c.default)));
+      else
+        container.render(React.createElement(component.default));
     }
   });
 }
