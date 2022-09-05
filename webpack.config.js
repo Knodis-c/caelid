@@ -24,7 +24,7 @@ module.exports = (env, args) => {
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      liveReload: false,
+      liveReload: true,
       static: {
         directory: resolve(CWD, "public"),
         publicPath: "/static",
@@ -32,7 +32,7 @@ module.exports = (env, args) => {
       devMiddleware: {
         writeToDisk: true
       },
-      hot: true
+      hot: false
     },
 
     module: {
