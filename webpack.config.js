@@ -16,7 +16,14 @@ module.exports = (env, args) => {
       clean: true
     },
 
+    experiments: {
+      asyncWebAssembly: true,
+    },
+
     devServer: {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       liveReload: false,
       static: {
         directory: resolve(CWD, "public"),

@@ -73,15 +73,10 @@ impl Engine {
     fn application_v1_js() -> String {
         use super::server::{PUBLIC_PATH, STATIC_ASSETS_PATH};
 
-        let webpack_port = dotenv::var("WEBPACK_DEV_SERVER_PORT")
-            .unwrap_or("8080".to_owned())
-            .parse::<u16>()
-            .unwrap();
-
-        let host = Ipv4Addr::new(127, 0, 0, 1);
-        let socket_addr = SocketAddrV4::new(host, webpack_port);
+        let socket_addr = Self::webpack_assets_addr();
 
         let mut entries = fs::read_dir(STATIC_ASSETS_PATH).unwrap();
+
         let maybe_javascript = entries.find(|dir_entry| {
             if let Ok(entry) = dir_entry {
                 let name = entry.file_name().into_string().unwrap();
@@ -101,6 +96,17 @@ impl Engine {
             PUBLIC_PATH,
             javascript
         )
+    }
+
+    #[cfg(any(debug_assertions, test))]
+    fn webpack_assets_addr() -> SocketAddrV4 {
+        let webpack_port = dotenv::var("WEBPACK_DEV_SERVER_PORT")
+            .map(|port| port.parse::<u16>().unwrap())
+            .unwrap();
+
+        let host = Ipv4Addr::new(127, 0, 0, 1);
+
+        SocketAddrV4::new(host, webpack_port)
     }
 
     #[cfg(not(debug_assertions))]
