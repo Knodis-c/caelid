@@ -10,7 +10,7 @@ ARGUMENTS:
 EOT
 
 run_server() {
-  watchexec -r -e rs,html -- cargo run
+  watchexec -r -e rs,html -- "rm server.pid 2> /dev/null; cargo run"
 }
 
 run_webpack() {
