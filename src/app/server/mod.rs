@@ -73,8 +73,9 @@ pub async fn run() -> std::io::Result<()> {
         .map(|val| val.parse::<u32>().unwrap())
         .unwrap();
 
-    // Threadpool size per worker for blocking tasks.
-    let blocking_workers_pool_size_per_worker = dotenv::var("BLOCKING_WORKER_POOL_SIZE")
+    // Threadpool size across all workers for blocking tasks. Each worker has its own independent
+    // threadpool, but the total threads across all pools will not exceed this amount.
+    let blocking_workers_pool_size_limit = dotenv::var("BLOCKING_WORKER_POOL_SIZE")
         .map(|size| size.parse::<usize>().unwrap())
         .unwrap();
 
@@ -120,7 +121,7 @@ pub async fn run() -> std::io::Result<()> {
     HttpServer::new(app_factory)
         .workers(num_workers)
         .backlog(backlog)
-        .worker_max_blocking_threads(blocking_workers_pool_size_per_worker)
+        .worker_max_blocking_threads(blocking_workers_pool_size_limit)
         .client_disconnect_timeout(client_disconnect_timeout_ms)
         .client_request_timeout(client_request_timeout_ms)
         .keep_alive(keep_alive_s)
