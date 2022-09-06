@@ -30,4 +30,3 @@ pub struct User {
     #[serde(with = "ts_seconds_option")]
     pub deleted_at: Option<NaiveDateTime>,
 }
-

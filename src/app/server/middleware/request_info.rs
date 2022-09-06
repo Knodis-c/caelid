@@ -59,26 +59,33 @@ where
             let conn_info = req.connection_info();
             let ip = conn_info.realip_remote_addr()
                 .and_then(|ip| Some(format!("{}={}", graphics::bold("ip"), ip)))
-                .or(Some("".to_owned()))
-                .unwrap(); // Will never panic.
+                .unwrap_or("".to_owned());
+            let resource = req
+                .resource_map()
+                .match_name(req.path())
+                .map(|path| format!("{}={}", graphics::bold("resource"), path))
+                .unwrap_or("".to_owned());
 
             let host = format!("{}={}", graphics::bold("host"), conn_info.host());
             let method = format!("{}={}", graphics::bold("method"), req.method());
             let path = format!("{}={}", graphics::bold("path"), req.path());
             let req_id = format!("{}={}", graphics::bold("request_id"), request_id);
 
-            format!("{method} {path} {host} {req_id} {ip}")
+            format!("{method} {path} {host} {req_id} {ip} {resource}")
         };
 
         let fut = self.service.call(req);
 
         Box::pin(async move {
             let res = fut.await?;
+            let status = res.status().as_u16();
 
             log::info!(
-                "{output} {}={}ms",
+                "{output} {}={}ms {}={}",
                 graphics::bold("duration"),
-                timestamp.elapsed().as_millis()
+                timestamp.elapsed().as_millis(),
+                graphics::bold("status"),
+                status
             );
 
             Ok(res)
