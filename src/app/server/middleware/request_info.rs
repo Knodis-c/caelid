@@ -10,6 +10,7 @@ use std::{
 };
 use uuid::Uuid;
 
+/// For logging salient request information.
 pub struct RequestInfoFactory;
 
 impl RequestInfoFactory {
@@ -55,23 +56,32 @@ where
         let timestamp = Instant::now();
 
         let output = {
-            let request_id = Uuid::new_v4();
-            let conn_info = req.connection_info();
-            let ip = conn_info.realip_remote_addr()
-                .and_then(|ip| Some(format!("{}={}", graphics::bold("ip"), ip)))
-                .unwrap_or("".to_owned());
+            let method = Some(format!("{}={}", graphics::bold("method"), req.method()));
+
+            let path = Some(format!("{}={}", graphics::bold("path"), req.path()));
+
             let resource = req
                 .resource_map()
                 .match_name(req.path())
-                .map(|path| format!("{}={}", graphics::bold("resource"), path))
-                .unwrap_or("".to_owned());
+                .map(|path| format!("{}={}", graphics::bold("resource"), path));
 
-            let host = format!("{}={}", graphics::bold("host"), conn_info.host());
-            let method = format!("{}={}", graphics::bold("method"), req.method());
-            let path = format!("{}={}", graphics::bold("path"), req.path());
-            let req_id = format!("{}={}", graphics::bold("request_id"), request_id);
+            let host = Some(format!("{}={}", graphics::bold("host"), req.connection_info().host()));
 
-            format!("{method} {path} {host} {req_id} {ip} {resource}")
+            let ip = req.connection_info().realip_remote_addr()
+                .map(|ip| format!("{}={}", graphics::bold("ip"), ip));
+
+            let req_id = Some(format!("{}={}", graphics::bold("request_id"), Uuid::new_v4()));
+
+            let mut log = vec![];
+
+            method.and_then(|i| Some(log.push(i.to_owned())));
+            path.and_then(|i| Some(log.push(i.to_owned())));
+            resource.and_then(|i| Some(log.push(i.to_owned())));
+            host.and_then(|i| Some(log.push(i.to_owned())));
+            ip.and_then(|i| Some(log.push(i.to_owned())));
+            req_id.and_then(|i| Some(log.push(i.to_owned())));
+
+            log.join(" ")
         };
 
         let fut = self.service.call(req);
