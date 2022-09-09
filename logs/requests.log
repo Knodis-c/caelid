@@ -1,0 +1,5 @@
+[2022-09-09 00:11:54 | INFO] [1mmethod[0m=GET [1mpath[0m=/ [1mhost[0m=localhost:3000 [1mip[0m=127.0.0.1 [1mrequest_id[0m=f84452fa-08cb-4551-96f8-df280eb74901 [1mduration[0m=0ms [1mstatus[0m=200
+[2022-09-09 00:11:54 | INFO] [1mmethod[0m=GET [1mpath[0m=/ [1mhost[0m=localhost:3000 [1mip[0m=127.0.0.1 [1mrequest_id[0m=b79ae8d6-becc-4275-bb0e-243c1e9edc67 [1mduration[0m=0ms [1mstatus[0m=200
+[2022-09-09 00:11:54 | INFO] [1mmethod[0m=GET [1mpath[0m=/ [1mhost[0m=localhost:3000 [1mip[0m=127.0.0.1 [1mrequest_id[0m=f7373f6b-c953-4ac0-a77b-b87a59517944 [1mduration[0m=0ms [1mstatus[0m=200
+[2022-09-09 00:11:54 | INFO] [1mmethod[0m=GET [1mpath[0m=/ [1mhost[0m=localhost:3000 [1mip[0m=127.0.0.1 [1mrequest_id[0m=caf62385-26ba-45da-85d6-da11d77e068d [1mduration[0m=0ms [1mstatus[0m=200
+[2022-09-09 00:11:54 | INFO] [1mmethod[0m=GET [1mpath[0m=/ [1mhost[0m=localhost:3000 [1mip[0m=127.0.0.1 [1mrequest_id[0m=dd9575bd-1d64-44fe-91ec-3a26e9576c21 [1mduration[0m=0ms [1mstatus[0m=200
