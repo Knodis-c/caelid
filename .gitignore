@@ -6,3 +6,4 @@ dist/
 public/
 server.pid
 .env
+log/**/*

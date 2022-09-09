@@ -36,7 +36,8 @@ async fn main() -> std::io::Result<()> {
     // Handle SIGINT as a SIGTERM.
     rt::spawn(async move {
         signal::ctrl_c().await.unwrap();
-        kill(Pid::from_raw(pid), Signal::SIGTERM).unwrap();
+        kill(Pid::from_raw(pid), Signal::SIGTERM)
+            .expect(&format!("Failed to kill {pid}"));
     });
 
     app::server::run().await?;
