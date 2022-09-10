@@ -2,7 +2,7 @@ use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     Error,
 };
-use crate::internal::ansi::graphics;
+use crate::internal::ansi::colors;
 use futures_util::future::LocalBoxFuture;
 use std::{
     future::{ready, Ready},
@@ -56,21 +56,21 @@ where
         let timestamp = Instant::now();
 
         let output = {
-            let method = Some(format!("{}={}", graphics::bold("method"), req.method()));
+            let method = Some(format!("{}={}", colors::bold("method"), req.method()));
 
-            let path = Some(format!("{}={}", graphics::bold("path"), req.path()));
+            let path = Some(format!("{}={}", colors::bold("path"), req.path()));
 
             let resource = req
                 .resource_map()
                 .match_name(req.path())
-                .map(|path| format!("{}={}", graphics::bold("resource"), path));
+                .map(|path| format!("{}={}", colors::bold("resource"), path));
 
-            let host = Some(format!("{}={}", graphics::bold("host"), req.connection_info().host()));
+            let host = Some(format!("{}={}", colors::bold("host"), req.connection_info().host()));
 
             let ip = req.connection_info().realip_remote_addr()
-                .map(|ip| format!("{}={}", graphics::bold("ip"), ip));
+                .map(|ip| format!("{}={}", colors::bold("ip"), ip));
 
-            let req_id = Some(format!("{}={}", graphics::bold("request_id"), Uuid::new_v4()));
+            let req_id = Some(format!("{}={}", colors::bold("request_id"), Uuid::new_v4()));
 
             let mut log = vec![];
 
@@ -90,13 +90,13 @@ where
             let res = fut.await?;
             let status = res.status().as_u16();
 
-            log::info!(
-                "{output} {}={}ms {}={}",
-                graphics::bold("duration"),
-                timestamp.elapsed().as_millis(),
-                graphics::bold("status"),
-                status
-            );
+            //log::info!(
+                //"{output} {}={}ms {}={}",
+                //colors::bold("duration"),
+                //timestamp.elapsed().as_millis(),
+                //colors::bold("status"),
+                //status
+            //);
 
             Ok(res)
         })
