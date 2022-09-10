@@ -114,9 +114,9 @@ pub async fn run() -> std::io::Result<()> {
         .map(|val| val.parse::<u64>().unwrap())
         .unwrap();
 
-    log::info!("Initializing {} workers", num_workers);
-    log::info!("Initializing {} Postgres connections per worker", CONNS_PER_WORKER);
-    log::info!("Listening on {}", socketaddr.to_string());
+    info!("Initializing {} workers", num_workers);
+    info!("Initializing {} Postgres connections per worker", CONNS_PER_WORKER);
+    info!("Listening on {}", socketaddr.to_string());
 
     HttpServer::new(app_factory)
         .workers(num_workers)

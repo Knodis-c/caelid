@@ -9,3 +9,6 @@ pub mod log;
 
 /// Utility for pid files.
 pub mod pid;
+
+/// Tracing infrastructure.
+pub mod tracing;

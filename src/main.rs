@@ -6,6 +6,7 @@ use nix::{
 };
 #[macro_use] extern crate proc_macros;
 use dotenv;
+#[macro_use] extern crate tracing;
 
 /// Core business logic of the application.
 mod app;
@@ -16,12 +17,10 @@ mod internal;
 /// Snapshot of the database schema.
 mod schema;
 
-fn cleanup() -> Result<(), std::io::Error> {
-    log::info!("Gracefully shutting down");
-
+#[tracing::instrument]
+fn cleanup(_test: u8) -> Result<(), std::io::Error> {
+    info!("Cleaning up...");
     internal::pid::destroy().unwrap();
-
-    log::info!("Graceful shutdown complete");
 
     Ok(())
 }
@@ -29,7 +28,13 @@ fn cleanup() -> Result<(), std::io::Error> {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    internal::log::init_logger();
+    internal::tracing::subscribers::default::init();
+
+    info!("haha");
+    trace!("haha");
+    debug!("haha");
+    warn!("haha");
+    error!("haha");
 
     let pid = internal::pid::create()? as i32;
 
@@ -41,5 +46,5 @@ async fn main() -> std::io::Result<()> {
 
     app::server::run().await?;
 
-    cleanup()
+    cleanup(8)
 }

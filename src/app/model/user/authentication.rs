@@ -13,10 +13,10 @@ impl User {
             Ok(user) => Ok(user),
             Err(e) => {
                 if let DieselError::NotFound = e {
-                    log::info!("Failed to authenticate username, '{}', via credentials", uname);
+                    //log::info!("Failed to authenticate username, '{}', via credentials", uname);
                     Err(Error::AuthenticationFailure)
                 } else {
-                    log::error!("Failed to authenticate username, '{}', due to: {}", uname, e);
+                    //log::error!("Failed to authenticate username, '{}', due to: {}", uname, e);
                     Err(Error::Diesel(e))
                 }
             }
